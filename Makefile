@@ -1,5 +1,5 @@
 # Target file name.
-TARGET = st
+TARGET = pewpewpew
 
 # List C source files here.
 CCSOURCES = Game.c
