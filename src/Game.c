@@ -29,33 +29,34 @@ static list_t *g_bullets;
 static list_t *g_explosions;
 static list_t *g_players;
 
-void Init(struct Gamestate* state) {
+static bool is_initalized;
+
+void self_init() {
+	is_initalized = true;
+
 	g_planets = list(NPLANETS);
 	g_bullets = list(NBULLETS);
 	g_explosions = list(NEXPLOSIONS);
 	g_players = list(NPLAYERS);
 
 	for (int i = 0; i < NPLANETS; i++) {
-		bool retry = true;
-		while (retry) {
-			retry = false;
-			scalar_type radius = randrange(8,15);
-			planet_t *new = planet(
-					vector(randrange(radius + 1,SCREEN_HEIGHT-radius - 1), randrange(radius + 1,SCREEN_WIDTH-radius-1)),
-					radius,
-					randrange(1e5, 2e5)
-					);
-			for (int k = 0; k < i; k++) {
-				planet_t *old = list_get(g_planets, k);
-				if (collision_dist(old->o, new->o) <= 0) {
-					free_planet(new);
-					retry = true;
-					break;
-				}
+		scalar_type radius;
+RETRY:
+		radius = randrange(8,15);
+		planet_t *new = planet(
+				vector(randrange(radius + 1,SCREEN_HEIGHT-radius - 1), randrange(radius + 1,SCREEN_WIDTH-radius-1)),
+				radius,
+				randrange(1e5, 2e5)
+				);
+		for (int k = 0; k < i; k++) {
+			planet_t *old = list_get(g_planets, k);
+			if (collision_dist(old->o, new->o) <= 0) {
+				free_planet(new);
+				goto RETRY;
 			}
-
-			list_add(g_planets, new);
 		}
+
+		list_add(g_planets, new);
 	}
 
 	for (int i = 0; i < NPLAYERS; i++) {
@@ -63,6 +64,10 @@ void Init(struct Gamestate* state) {
 	}
 
 	Delay(30);
+}
+
+void Init(struct Gamestate* state) {
+	self_init();
 }
 
 void OnEnter(struct Gamestate* state) {
@@ -174,7 +179,37 @@ bool at_most_one_player_alive(list_t *players) {
 	return players_alive < 2;
 }
 
+void destroy_everything(list_t *planets, list_t *bullets, list_t *explosions, list_t *players) {
+	for (int i = 0; i < planets->size; i++) {
+		planet_t *planet = list_get(planets, i);
+		free_planet(planet);
+	}
+	free_list(planets);
+
+	for (int i = 0; i < bullets->size; i++) {
+		bullet_t *bullet = list_get(bullets, i);
+		free_bullet(bullet);
+	}
+	free_list(bullets);
+
+	for (int i = 0; i < explosions->size; i++) {
+		explosion_t *explosion = list_get(explosions, i);
+		free_explosion(explosion);
+	}
+	free_list(explosions);
+
+	for (int i = 0; i < players->size; i++) {
+		player_t *player = list_get(players, i);
+		free_player(player);
+	}
+	free_list(players);
+}
+
 void Update(uint32_t a) {
+	if (!is_initalized) {
+		self_init();
+	}
+
 	Step(g_planets, g_bullets);
 	Update_explosions(g_explosions, g_players);
 	Update_collisions(g_planets, g_bullets, g_explosions);
@@ -182,6 +217,8 @@ void Update(uint32_t a) {
 
 	if (at_most_one_player_alive(g_players)) {
 		ChangeState(&WinScreen);
+		destroy_everything(g_planets, g_bullets, g_explosions, g_players);
+		is_initalized = false;
 	}
 }
 
@@ -229,6 +266,7 @@ void draw_scopes(list_t *players, Bitmap *b) {
 }
 
 void Draw(Bitmap *b) {
+	if (!is_initalized) { return; }
 	ClearBitmap(b);
 	draw_bullets(g_bullets, b);
 	draw_explosions(g_explosions, b);
