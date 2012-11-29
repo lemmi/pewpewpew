@@ -155,19 +155,25 @@ void Update_explosions(list_t *explosions, list_t *players) {
 }
 
 void Update_players(list_t *players, list_t *bullets) {
-	if (players->size >= 1) {
-		player_t *player = list_get(players, 0);
+	if (players->size != 2) { return; }
 
-		if (GetPushbuttonState().Right) { move_player(player, +0.3); }
-		if (GetPushbuttonState().Left)  { move_player(player, -0.3); }
-		if (GetPushbuttonState().Up)    { move_player_barrel(player, +0.3); }
-		if (GetPushbuttonState().Down)  { move_player_barrel(player, -0.3); }
-		if (GetPushbuttonState().A)     {
+	snes_button_state_t state[2] = { GetControllerState1(), GetControllerState2() };
+
+	for (int i = 0; i < 2; i++) {
+		player_t *player = list_get(players, i);
+		snes_button_state_t s = state[i];
+
+		if (s.buttons.Right) { move_player(player, +0.3); }
+		if (s.buttons.Left)  { move_player(player, -0.3); }
+		if (s.buttons.Up)    { move_player_barrel(player, +0.3); }
+		if (s.buttons.Down)  { move_player_barrel(player, -0.3); }
+		if (s.buttons.A)     {
 			if (!list_is_full(bullets)) {
 				bullet_t * bullet = player_shoot(player);
 				list_add(bullets, bullet);
 			}
 		}
+
 	}
 }
 
