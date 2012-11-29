@@ -17,6 +17,7 @@ typedef struct {
 	scalar_type bullet_energy;
 	Pixel color;
 	bool is_dead;
+	int next_shoot_timer;
 } player_t;
 
 static inline void update_player_object(player_t *p) {
@@ -29,9 +30,10 @@ static inline player_t *player(planet_t *pl, int deg, Pixel color) {
 	p->o = object(pl->o->pos, 3, 0);
 	p->deg = deg;
 	p->barrel_deg_offset = 0;
-	p->bullet_energy = 1000;
+	p->bullet_energy = 4000;
 	p->color = color;
 	p->is_dead = false;
+	p->next_shoot_timer = 0;
 
 	update_player_object(p);
 
@@ -82,12 +84,28 @@ static inline void hit_player(player_t *p) {
 
 static inline bullet_t *player_shoot(player_t *p) {
 	if (p->is_dead) { return NULL; }
+	if (p->next_shoot_timer > 0) { return NULL; }
+	p->next_shoot_timer=100;
 
 	vector_t barrel_end = calc_barrel_end(p);
 
 	scalar_type bullet_vel = sqrts((scalar_type) 2 * p->bullet_energy / BULLET_MASS) * dt;
 
 	return bullet(barrel_end, bullet_vel * vangle(p->deg + p->barrel_deg_offset), p->color);
+}
+
+static inline bullet_t *player_shoot_blanket(player_t *p) {
+	int old_timer = p->next_shoot_timer;
+	p->next_shoot_timer = 0;
+	bullet_t *bullet = player_shoot(p);
+	p->next_shoot_timer = old_timer;
+	return bullet;
+}
+
+static inline void step_player(player_t *p) {
+	if (p->next_shoot_timer > 0) {
+		p->next_shoot_timer--;
+	}
 }
 
 #endif /* end of include guard: PLAYERS_H */

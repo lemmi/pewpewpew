@@ -30,9 +30,11 @@ static list_t *g_explosions;
 static list_t *g_players;
 
 static bool is_initalized;
+static int32_t next_update_timer;
 
 void self_init() {
 	is_initalized = true;
+	next_update_timer = 0;
 
 	g_planets = list(NPLANETS);
 	g_bullets = list(NBULLETS);
@@ -147,6 +149,7 @@ void Update_players(list_t *players, list_t *bullets) {
 
 	for (int i = 0; i < 2; i++) {
 		player_t *player = list_get(players, i);
+		step_player(player);
 		snes_button_state_t s = state[i];
 
 		if (s.buttons.Up)    { set_bullet_energy(player, +10.0); }
@@ -158,7 +161,9 @@ void Update_players(list_t *players, list_t *bullets) {
 		if (s.buttons.A)     {
 			if (!list_is_full(bullets)) {
 				bullet_t * bullet = player_shoot(player);
-				list_add(bullets, bullet);
+				if (bullet != NULL) {
+					list_add(bullets, bullet);
+				}
 			}
 		}
 
@@ -205,10 +210,8 @@ void destroy_everything(list_t *planets, list_t *bullets, list_t *explosions, li
 	free_list(players);
 }
 
-void Update(uint32_t a) {
-	if (!is_initalized) {
-		self_init();
-	}
+void Do_update() {
+	if (!is_initalized) { return; }
 
 	Step(g_planets, g_bullets);
 	Update_explosions(g_explosions, g_players);
@@ -219,6 +222,18 @@ void Update(uint32_t a) {
 		ChangeState(&WinScreen);
 		destroy_everything(g_planets, g_bullets, g_explosions, g_players);
 		is_initalized = false;
+	}
+}
+void Update(uint32_t a) {
+	if (!is_initalized) {
+		self_init();
+	}
+
+	next_update_timer += a;
+	if (a > 100) { SetLEDs(0x02); }
+
+	for (; next_update_timer > 0; next_update_timer -= 1) {
+		Do_update();
 	}
 }
 
@@ -250,7 +265,7 @@ void draw_scopes(list_t *players, Bitmap *b) {
 	list_t *bulletlist = list(1);
 	for (int i = 0; i < players->size; i++) {
 		player_t *player = list_get(players, i);
-		bullet_t *bullet = player_shoot(player);
+		bullet_t *bullet = player_shoot_blanket(player);
 		bullet->color &= 0x65;
 		list_add(bulletlist, bullet);
 		for (int l = 0; l < SCOPEDOTS; l++) {

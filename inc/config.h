@@ -15,10 +15,10 @@ extern const scalar_type BULLET_MASS;
 /* world */
 #define NPLANETS 6
 #define NPLAYERS 2
-#define NBULLETS 20
+#define NBULLETS 200
 #define NEXPLOSIONS 20
 #define SCOPEDOTS 20
-#define SCOPESTEPS 10
+#define SCOPESTEPS 20
 
 /* graphics */
 #define NPLAYERCOLORS 2
