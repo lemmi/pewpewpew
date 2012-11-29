@@ -20,6 +20,7 @@ void OnLeave(struct Gamestate* state);
 void Update(uint32_t);
 void Draw(Bitmap *);
 
+extern Gamestate WinScreen;
 Gamestate InitState = { Init, OnEnter, OnLeave, Update, Draw };
 Game* TheGame = &(Game) {&InitState};
 
@@ -162,11 +163,29 @@ void Update_players(list_t *players, list_t *bullets) {
 	}
 }
 
+bool at_most_one_player_alive(list_t *players) {
+	int players_alive = 0;
+
+	for (int i = 0; i < players->size; i++) {
+		player_t *player = list_get(players, i);
+
+		if (!player->is_dead) {
+			players_alive++;
+		}
+	}
+
+	return players_alive < 2;
+}
+
 void Update(uint32_t a) {
 	Step(g_planets, g_bullets);
 	Update_explosions(g_explosions, g_players);
 	Update_collisions(g_planets, g_bullets, g_explosions);
 	Update_players(g_players, g_bullets);
+
+	if (at_most_one_player_alive(g_players)) {
+		ChangeState(&WinScreen);
+	}
 }
 
 void draw_planets(list_t *planets, Bitmap *b) {

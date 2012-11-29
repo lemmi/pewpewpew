@@ -2,7 +2,7 @@
 TARGET = pewpewpew
 
 # List C source files here.
-CCSOURCES = Game.c config.c
+CCSOURCES = Game.c config.c WinScreen.c
 
 # Additional local static libs to link against
 LIBS = gaming stm32f4xx fatfs sdcard graphics 
