@@ -20,7 +20,7 @@ Game* TheGame = &(Game) {&InitState};
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 200
 
-static const scalar_type G = 0.1;
+static const scalar_type G = 0.5;
 
 static int planets = 6;
 static object_t *static_object[MAXOBJECTS + 1];
@@ -57,8 +57,7 @@ void Init(struct Gamestate* state) {
 	}
 
 	for (int i = 0;  i < MAXOBJECTS; i++, projectiles++) {
-		dynamic_object[i] = object(vector(50, 50), 1, 1);
-		dynamic_object[i]->pos_old -= 0.5f*dt*vector(0, 100+i);
+		dynamic_object[i] = object(vector(50, 50 + i), 1, 1);
 	}
 	Delay(300);
 }
@@ -90,13 +89,6 @@ void Step(object_t *statics[], const int ns, object_t *dynamics[], const int nd)
 
 void Update(uint32_t a) {
 	Step(static_object, planets, dynamic_object, projectiles);
-	Step(static_object, planets, dynamic_object, projectiles);
-	Step(static_object, planets, dynamic_object, projectiles);
-	Step(static_object, planets, dynamic_object, projectiles);
-	Step(static_object, planets, dynamic_object, projectiles);
-	Step(static_object, planets, dynamic_object, projectiles);
-	Step(static_object, planets, dynamic_object, projectiles);
-	Step(static_object, planets, dynamic_object, projectiles);
 }
 
 void Draw(Bitmap *b) {
@@ -112,6 +104,4 @@ void Draw(Bitmap *b) {
 		object_t *o = dynamic_object[i];
 		DrawFilledCircle(b, o->pos[1], o->pos[0], o->radius, RGB(0,0,255));
 	}
-
-	//DrawFilledCircle(b, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, RGB(255,255,255));
 }
