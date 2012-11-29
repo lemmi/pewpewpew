@@ -149,10 +149,12 @@ void Update_players(list_t *players, list_t *bullets) {
 		player_t *player = list_get(players, i);
 		snes_button_state_t s = state[i];
 
+		if (s.buttons.Down)  { set_bullet_energy(player, +0.3); }
+		if (s.buttons.Up)    { set_bullet_energy(player, +0.3); }
 		if (s.buttons.Right) { move_player(player, +0.3); }
 		if (s.buttons.Left)  { move_player(player, -0.3); }
-		if (s.buttons.Up)    { move_player_barrel(player, +0.3); }
-		if (s.buttons.Down)  { move_player_barrel(player, -0.3); }
+		if (s.buttons.R)     { move_player_barrel(player, +0.3); }
+		if (s.buttons.L)     { move_player_barrel(player, -0.3); }
 		if (s.buttons.A)     {
 			if (!list_is_full(bullets)) {
 				bullet_t * bullet = player_shoot(player);

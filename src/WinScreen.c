@@ -20,8 +20,9 @@ void WinScreen_Init(struct Gamestate* state)
 void WinScreen_Update(uint32_t delta)
 {
 	snes_button_state_t state = GetControllerState1();
-	if (state.buttons.Start)
+	if (state.buttons.Start) {
 		ExitState();
+	}
 }
 
 void WinScreen_Draw(Bitmap* b)
