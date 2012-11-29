@@ -68,4 +68,8 @@ static inline void *list_get_last(list_t *l) {
 	return l->data[l->size - 1];
 }
 
+static inline bool list_is_full(list_t *l) {
+	return l->size >= l->max;
+}
+
 #endif /* end of include guard: LIST_H */

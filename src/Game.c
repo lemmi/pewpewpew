@@ -74,7 +74,7 @@ void Init(struct Gamestate* state) {
 
 
 	for (int i = 0;  i < NBULLETS; i++) {
-		list_add(g_bullets, bullet(vector(50, 50 + i)));
+		list_add(g_bullets, bullet(vector(50, 50 + i), vector(0, 0)));
 	}
 
 	for (int i = 0; i < NPLAYERS; i++) {
@@ -132,9 +132,17 @@ void Update_collisions(list_t *planets, list_t *bullets, list_t *explosions) {
 	list_clean_up(bullets);
 }
 
-void Update_explosions(list_t *explosions) {
+void Update_explosions(list_t *explosions, list_t *players) {
 	for (int i = 0; i < explosions->size; i++) {
 		explosion_t *explosion = list_get(explosions, i);
+
+		for (int p = 0; p < players->size; p++) {
+			player_t *player = list_get(players, p);
+
+			if (explosion_affects(explosion, player->o)) {
+				hit_player(player);
+			}
+		}
 
 		step_explosion(explosion);
 		if (explosion_is_dead(explosion)) {
@@ -146,23 +154,28 @@ void Update_explosions(list_t *explosions) {
 	list_clean_up(explosions);
 }
 
-void Update_players(list_t *players) {
+void Update_players(list_t *players, list_t *bullets) {
 	if (players->size >= 1) {
-		if (GetPushbuttonState().Right) { move_player(list_get(players, 0), +0.3); }
-		if (GetPushbuttonState().Left)  { move_player(list_get(players, 0), -0.3); }
-	}
+		player_t *player = list_get(players, 0);
 
-	if (players->size >= 2) {
-		if (GetPushbuttonState().A) { move_player(list_get(players, 1), +0.3); }
-		if (GetPushbuttonState().B) { move_player(list_get(players, 1), -0.3); }
+		if (GetPushbuttonState().Right) { move_player(player, +0.3); }
+		if (GetPushbuttonState().Left)  { move_player(player, -0.3); }
+		if (GetPushbuttonState().Up)    { move_player_barrel(player, +0.3); }
+		if (GetPushbuttonState().Down)  { move_player_barrel(player, -0.3); }
+		if (GetPushbuttonState().A)     {
+			if (!list_is_full(bullets)) {
+				bullet_t * bullet = player_shoot(player);
+				list_add(bullets, bullet);
+			}
+		}
 	}
 }
 
 void Update(uint32_t a) {
 	Step(g_planets, g_bullets);
-	Update_explosions(g_explosions);
+	Update_explosions(g_explosions, g_players);
 	Update_collisions(g_planets, g_bullets, g_explosions);
-	Update_players(g_players);
+	Update_players(g_players, g_bullets);
 }
 
 void draw_planets(list_t *planets, Bitmap *b) {

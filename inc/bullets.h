@@ -12,9 +12,10 @@ static inline void draw_bullet(const bullet_t *bu, Bitmap *bi) {
 	DrawFilledCircle(bi, bu->o->pos[1], bu->o->pos[0], bu->o->radius, BLUE);
 }
 
-static inline bullet_t *bullet(vector_t pos) {
+static inline bullet_t *bullet(vector_t pos, vector_t v) {
 	bullet_t *b = malloc(sizeof(bullet_t));
 	*b = (bullet_t) { .o = object(pos, 1, 1) };
+	b->o->pos_old -= v;
 	return b;
 }
 

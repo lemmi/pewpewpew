@@ -32,4 +32,8 @@ static inline bool explosion_is_dead(explosion_t *e) {
 	return e->o->radius == 0;
 }
 
+static inline bool explosion_affects(explosion_t *e, object_t *o) {
+	return collision_dist(e->o, o) <= 0;
+}
+
 #endif /* end of include guard: EXPLOSION_H */
