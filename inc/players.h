@@ -14,6 +14,7 @@ typedef struct {
 	object_t *o;
 	scalar_type deg;
 	scalar_type barrel_deg_offset;
+	scalar_type bullet_energy;
 	uint8_t color;
 	bool is_dead;
 } player_t;
@@ -31,6 +32,8 @@ static inline player_t *player(planet_t *pl, int deg, uint8_t color) {
 	p->p = pl;
 	p->o = object(pl->o->pos, 3, 0);
 	p->deg = deg;
+	p->barrel_deg_offset = 0;
+	p->bullet_energy = 1;
 	p->color = color;
 	p->is_dead = false;
 
@@ -55,12 +58,18 @@ static inline void free_player(player_t *p) {
 }
 
 static inline void move_player(player_t *p, scalar_type deg) {
+	if (p->is_dead) { return; }
+
 	p->deg += deg;
 	update_player_object(p);
 }
 
 static inline void move_player_barrel(player_t *p, scalar_type deg) {
+	if (p->is_dead) { return; }
+
 	p->barrel_deg_offset += deg;
+	if (p->barrel_deg_offset > 90)  { p->barrel_deg_offset = 90;  }
+	if (p->barrel_deg_offset < -90) { p->barrel_deg_offset = -90; }
 }
 
 static inline void hit_player(player_t *p) {
@@ -68,14 +77,18 @@ static inline void hit_player(player_t *p) {
 }
 
 static inline bullet_t *player_shoot(player_t *p) {
+	if (p->is_dead) { return NULL; }
+
 	int barrel_end_x = p->o->pos[1] + p->o->radius * 3 * cos((p->deg + p->barrel_deg_offset)/(2.0 * M_PI));
 	int barrel_end_y = p->o->pos[0] + p->o->radius * 3 * sin((p->deg + p->barrel_deg_offset)/(2.0 * M_PI));
+
+	scalar_type bullet_vel = sqrts((scalar_type) 2 * p->bullet_energy / BULLET_MASS) * dt;
 
 	return bullet(
 			vector(barrel_end_y, barrel_end_x),
 			vector(
-				0.3 * sin((p->deg + p->barrel_deg_offset)/(2.0 * M_PI)),
-				0.3 * cos((p->deg + p->barrel_deg_offset)/(2.0 * M_PI))
+				bullet_vel * sin((p->deg + p->barrel_deg_offset)/(2.0 * M_PI)),
+				bullet_vel * cos((p->deg + p->barrel_deg_offset)/(2.0 * M_PI))
 			      ));
 }
 

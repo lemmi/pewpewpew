@@ -2,10 +2,15 @@
 #define SMAT_H
 
 #include <math.h>
+#include <stdint.h>
+#include <game/Game.h>
 
 //typedef long double scalar_type;
+//#define sqrts sqrtl
 //typedef double scalar_type;
+//#define sqrts sqrt
 typedef float scalar_type;
+#define sqrts sqrtf
 
 typedef scalar_type vector_t __attribute__ ((vector_size (2*sizeof(scalar_type))));
 
@@ -19,7 +24,7 @@ static inline scalar_type vqlen(const vector_t v) {
 }
 
 static inline scalar_type vlen(const vector_t v) {
-	return sqrtf(vqlen(v));
+	return sqrts(vqlen(v));
 }
 
 static inline scalar_type rands() {

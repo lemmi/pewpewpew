@@ -3,6 +3,7 @@
 
 #include <game/Game.h>
 #include "objects.h"
+#include "config.h"
 
 typedef struct {
 	object_t *o;
@@ -14,7 +15,7 @@ static inline void draw_bullet(const bullet_t *bu, Bitmap *bi) {
 
 static inline bullet_t *bullet(vector_t pos, vector_t v) {
 	bullet_t *b = malloc(sizeof(bullet_t));
-	*b = (bullet_t) { .o = object(pos, 1, 1) };
+	*b = (bullet_t) { .o = object(pos, 1, BULLET_MASS) };
 	b->o->pos_old -= v;
 	return b;
 }
