@@ -5,6 +5,7 @@
 #include "planets.h"
 #include "bullets.h"
 #include "explosion.h"
+#include "players.h"
 #include "list.h"
 
 #include <stdio.h>
@@ -24,22 +25,29 @@ Game* TheGame = &(Game) {&InitState};
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 200
 
-#define NPLANETS 6
-#define NBULLETS 20
-#define NEXPLOSIONS 20
-
 static const scalar_type G = 0.5;
+static scalar_type dt = 0.005;
 
+#define NPLANETS 6
 static list_t *g_planets;
+
+#define NBULLETS 20
 static list_t *g_bullets;
+
+#define NEXPLOSIONS 20
 static list_t *g_explosions;
 
-static scalar_type dt = 0.005;
-static int t = 0;
+#define NPLAYERS 2
+static list_t *g_players;
+
+#define NPLAYERCOLORS 2
+static uint8_t player_colors[] = { RED, BLUE };
+
 void Init(struct Gamestate* state) {
 	g_planets = list(NPLANETS);
 	g_bullets = list(NBULLETS);
 	g_explosions = list(NEXPLOSIONS);
+	g_players = list(NPLAYERS);
 
 	for (int i = 0; i < NPLANETS; i++) {
 		bool retry = true;
@@ -68,6 +76,11 @@ void Init(struct Gamestate* state) {
 	for (int i = 0;  i < NBULLETS; i++) {
 		list_add(g_bullets, bullet(vector(50, 50 + i)));
 	}
+
+	for (int i = 0; i < NPLAYERS; i++) {
+		list_add(g_players, player(list_get(g_planets, i), 0, player_colors[i % NPLAYERCOLORS]));
+	}
+
 	Delay(300);
 }
 
@@ -133,10 +146,23 @@ void Update_explosions(list_t *explosions) {
 	list_clean_up(explosions);
 }
 
+void Update_players(list_t *players) {
+	if (players->size >= 1) {
+		if (GetPushbuttonState().Right) { move_player(list_get(players, 0), +0.3); }
+		if (GetPushbuttonState().Left)  { move_player(list_get(players, 0), -0.3); }
+	}
+
+	if (players->size >= 2) {
+		if (GetPushbuttonState().A) { move_player(list_get(players, 1), +0.3); }
+		if (GetPushbuttonState().B) { move_player(list_get(players, 1), -0.3); }
+	}
+}
+
 void Update(uint32_t a) {
 	Step(g_planets, g_bullets);
 	Update_explosions(g_explosions);
 	Update_collisions(g_planets, g_bullets, g_explosions);
+	Update_players(g_players);
 }
 
 void draw_planets(list_t *planets, Bitmap *b) {
@@ -157,9 +183,16 @@ void draw_explosions(list_t *explosions, Bitmap *b) {
 	}
 }
 
+void draw_players(list_t *players, Bitmap *b) {
+	for (int i = 0; i < players->size; i++) {
+		draw_player((player_t *)list_get(players, i), b);
+	}
+}
+
 void Draw(Bitmap *b) {
 	ClearBitmap(b);
 	draw_planets(g_planets, b);
 	draw_bullets(g_bullets, b);
 	draw_explosions(g_explosions, b);
+	draw_players(g_players, b);
 }
