@@ -269,9 +269,9 @@ void draw_scopes(list_t *players, Bitmap *b) {
 void Draw(Bitmap *b) {
 	if (!is_initalized) { return; }
 	ClearBitmap(b);
-	draw_bullets(g_bullets, b);
 	draw_explosions(g_explosions, b);
 	draw_players(g_players, b);
 	draw_planets(g_planets, b);
 	draw_scopes(g_players, b);
+	draw_bullets(g_bullets, b);
 }
