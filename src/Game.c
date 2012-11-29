@@ -120,7 +120,7 @@ void Update_collisions(list_t *planets, list_t *bullets, list_t *explosions) {
 			if (collision_dist(planet->o, bullet->o) < 0) {
 				list_mark_for_removal(bullets, b);
 
-				if (explosions->size < explosions->max) {
+				if (!list_is_full(explosions)) {
 					list_add(explosions, explosion(bullet->o->pos));
 				}
 
