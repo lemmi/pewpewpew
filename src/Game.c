@@ -1,6 +1,7 @@
 #include <game/Game.h>
 #include <game/Debug.h>
 
+#include "config.h"
 #include "objects.h"
 #include "planets.h"
 #include "bullets.h"
@@ -22,26 +23,10 @@ void Draw(Bitmap *);
 Gamestate InitState = { Init, OnEnter, OnLeave, Update, Draw };
 Game* TheGame = &(Game) {&InitState};
 
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 200
-
-static const scalar_type G = 0.5;
-static scalar_type dt = 0.005;
-
-#define NPLANETS 6
 static list_t *g_planets;
-
-#define NBULLETS 20
 static list_t *g_bullets;
-
-#define NEXPLOSIONS 20
 static list_t *g_explosions;
-
-#define NPLAYERS 2
 static list_t *g_players;
-
-#define NPLAYERCOLORS 2
-static uint8_t player_colors[] = { RED, BLUE };
 
 void Init(struct Gamestate* state) {
 	g_planets = list(NPLANETS);
