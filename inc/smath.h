@@ -39,5 +39,17 @@ static inline vector_t vrand() {
 	return vector(rands(), rands());
 }
 
+static inline scalar_type deg_to_rad(scalar_type deg) {
+	return deg * M_PI / (scalar_type) 180;
+}
+
+static inline scalar_type rad_to_deg(scalar_type rad) {
+	return rad * (scalar_type) 180 / M_PI;
+}
+
+static inline vector_t vangle(scalar_type deg) {
+	scalar_type rad = deg_to_rad(deg);
+	return vector(sin(rad), cos(rad));
+}
 
 #endif /* end of include guard: SMAT_H */

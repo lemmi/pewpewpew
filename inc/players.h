@@ -20,11 +20,7 @@ typedef struct {
 } player_t;
 
 static inline void update_player_object(player_t *p) {
-	object_t *o = p->o;
-	object_t *po = p->p->o;
-
-	o->pos[0] = po->pos[0] + sin(p->deg/(M_PI*2.0)) * po->radius;
-	o->pos[1] = po->pos[1] + cos(p->deg/(M_PI*2.0)) * po->radius;
+	p->o->pos = p->p->o->pos + vangle(p->deg) * p->p->o->radius;
 }
 
 static inline player_t *player(planet_t *pl, int deg, uint8_t color) {
@@ -42,14 +38,17 @@ static inline player_t *player(planet_t *pl, int deg, uint8_t color) {
 	return p;
 }
 
+static inline vector_t calc_barrel_end(player_t *p) {
+	return p->o->pos + p->o->radius * 3 * vangle(p->deg + p->barrel_deg_offset);
+}
+
 static inline void draw_player(player_t *p, Bitmap *b) {
 	if (p->is_dead) { return; }
 
 	DrawFilledCircle(b, p->o->pos[1], p->o->pos[0], p->o->radius, p->color);
 
-	int barrel_end_x = p->o->pos[1] + p->o->radius * 3 * cos((p->deg + p->barrel_deg_offset)/(2.0 * M_PI));
-	int barrel_end_y = p->o->pos[0] + p->o->radius * 3 * sin((p->deg + p->barrel_deg_offset)/(2.0 * M_PI));
-	DrawLine(b, p->o->pos[1], p->o->pos[0], barrel_end_x, barrel_end_y, p->color);
+	vector_t barrel_end = calc_barrel_end(p);
+	DrawLine(b, p->o->pos[1], p->o->pos[0], barrel_end[1], barrel_end[0], p->color);
 }
 
 static inline void free_player(player_t *p) {
@@ -79,17 +78,11 @@ static inline void hit_player(player_t *p) {
 static inline bullet_t *player_shoot(player_t *p) {
 	if (p->is_dead) { return NULL; }
 
-	int barrel_end_x = p->o->pos[1] + p->o->radius * 3 * cos((p->deg + p->barrel_deg_offset)/(2.0 * M_PI));
-	int barrel_end_y = p->o->pos[0] + p->o->radius * 3 * sin((p->deg + p->barrel_deg_offset)/(2.0 * M_PI));
+	vector_t barrel_end = calc_barrel_end(p);
 
 	scalar_type bullet_vel = sqrts((scalar_type) 2 * p->bullet_energy / BULLET_MASS) * dt;
 
-	return bullet(
-			vector(barrel_end_y, barrel_end_x),
-			vector(
-				bullet_vel * sin((p->deg + p->barrel_deg_offset)/(2.0 * M_PI)),
-				bullet_vel * cos((p->deg + p->barrel_deg_offset)/(2.0 * M_PI))
-			      ));
+	return bullet(barrel_end, bullet_vel * vangle(p->deg + p->barrel_deg_offset));
 }
 
 #endif /* end of include guard: PLAYERS_H */
