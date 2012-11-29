@@ -89,13 +89,20 @@ void Update(uint32_t a) {
 	Step(g_planets, NPLANETS, g_bullets, NBULLETS);
 }
 
-void Draw(Bitmap *b) {
-	ClearBitmap(b);
+static void draw_planets(Bitmap *b) {
 	for (int i = 0; i < NPLANETS; i++) {
 		draw_planet(g_planets[i], b);
 	}
+}
 
+static void draw_bullets(Bitmap *b) {
 	for (int i = 0; i < NBULLETS; i++) {
 		draw_bullet(g_bullets[i], b);
 	}
+}
+
+void Draw(Bitmap *b) {
+	ClearBitmap(b);
+	draw_planets(b);
+	draw_bullets(b);
 }
