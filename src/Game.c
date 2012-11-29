@@ -251,6 +251,7 @@ void draw_scopes(list_t *players, Bitmap *b) {
 	for (int i = 0; i < players->size; i++) {
 		player_t *player = list_get(players, i);
 		bullet_t *bullet = player_shoot(player);
+		bullet->color &= 0x65;
 		list_add(bulletlist, bullet);
 		for (int l = 0; l < SCOPEDOTS; l++) {
 			for (int s = 0; s < SCOPESTEPS; s++) {
@@ -272,4 +273,5 @@ void Draw(Bitmap *b) {
 	draw_explosions(g_explosions, b);
 	draw_players(g_players, b);
 	draw_planets(g_planets, b);
+	draw_scopes(g_players, b);
 }
