@@ -58,16 +58,11 @@ void Init(struct Gamestate* state) {
 		}
 	}
 
-
-	for (int i = 0;  i < NBULLETS; i++) {
-		list_add(g_bullets, bullet(vector(50, 50 + i), vector(0, 0)));
-	}
-
 	for (int i = 0; i < NPLAYERS; i++) {
 		list_add(g_players, player(list_get(g_planets, i), 0, player_colors[i % NPLAYERCOLORS]));
 	}
 
-	Delay(300);
+	Delay(30);
 }
 
 void OnEnter(struct Gamestate* state) {
@@ -149,8 +144,8 @@ void Update_players(list_t *players, list_t *bullets) {
 		player_t *player = list_get(players, i);
 		snes_button_state_t s = state[i];
 
-		if (s.buttons.Down)  { set_bullet_energy(player, +0.3); }
-		if (s.buttons.Up)    { set_bullet_energy(player, +0.3); }
+		if (s.buttons.Down)  { set_bullet_energy(player, +10.0); }
+		if (s.buttons.Up)    { set_bullet_energy(player, -10.0); }
 		if (s.buttons.Right) { move_player(player, +0.3); }
 		if (s.buttons.Left)  { move_player(player, -0.3); }
 		if (s.buttons.R)     { move_player_barrel(player, +0.3); }

@@ -71,7 +71,7 @@ static inline void move_player_barrel(player_t *p, scalar_type deg) {
 	if (p->barrel_deg_offset < -90) { p->barrel_deg_offset = -90; }
 }
 
-static inline set_bullet_energy(player_t *p, scalar_type delta) {
+static inline void set_bullet_energy(player_t *p, scalar_type delta) {
 	p->bullet_energy += delta;
 	p->bullet_energy = (p->bullet_energy < 0) ? 0 : p->bullet_energy;
 }
