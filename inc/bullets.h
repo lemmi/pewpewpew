@@ -7,16 +7,18 @@
 
 typedef struct {
 	object_t *o;
+	Pixel color;
 } bullet_t;
 
 static inline void draw_bullet(const bullet_t *bu, Bitmap *bi) {
-	DrawFilledCircle(bi, bu->o->pos[1], bu->o->pos[0], bu->o->radius, BLUE);
+	DrawFilledCircle(bi, bu->o->pos[1], bu->o->pos[0], bu->o->radius, bu->color);
 }
 
-static inline bullet_t *bullet(vector_t pos, vector_t v) {
+static inline bullet_t *bullet(vector_t pos, vector_t v, Pixel color) {
 	bullet_t *b = malloc(sizeof(bullet_t));
 	*b = (bullet_t) { .o = object(pos, 1, BULLET_MASS) };
 	b->o->pos_old -= v;
+	b->color = color;
 	return b;
 }
 

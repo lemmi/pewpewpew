@@ -17,6 +17,8 @@ extern const scalar_type BULLET_MASS;
 #define NPLAYERS 2
 #define NBULLETS 20
 #define NEXPLOSIONS 20
+#define SCOPEDOTS 10
+#define SCOPESTEPS 10
 
 /* graphics */
 #define NPLAYERCOLORS 2

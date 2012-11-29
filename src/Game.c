@@ -209,6 +209,25 @@ void draw_players(list_t *players, Bitmap *b) {
 	}
 }
 
+void draw_scopes(list_t *players, Bitmap *b) {
+	list_t *bulletlist = list(1);
+	for (int i = 0; i < players->size; i++) {
+		player_t *player = list_get(players, i);
+		bullet_t *bullet = player_shoot(player);
+		list_add(bulletlist, bullet);
+		for (int l = 0; l < SCOPEDOTS; l++) {
+			for (int s = 0; s < SCOPESTEPS; s++) {
+				Step(g_planets, bulletlist);
+			}
+			draw_bullets(bulletlist, b);
+		}
+		list_remove(bulletlist, 0);
+		free_bullet(bullet);
+
+	}
+	free_list(bulletlist);
+}
+
 void Draw(Bitmap *b) {
 	ClearBitmap(b);
 	draw_bullets(g_bullets, b);
