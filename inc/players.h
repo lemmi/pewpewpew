@@ -29,7 +29,7 @@ static inline player_t *player(planet_t *pl, int deg, uint8_t color) {
 	p->o = object(pl->o->pos, 3, 0);
 	p->deg = deg;
 	p->barrel_deg_offset = 0;
-	p->bullet_energy = 1;
+	p->bullet_energy = 1000;
 	p->color = color;
 	p->is_dead = false;
 
