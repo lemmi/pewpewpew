@@ -266,7 +266,7 @@ void draw_scopes(list_t *players, Bitmap *b) {
 	for (int i = 0; i < players->size; i++) {
 		player_t *player = list_get(players, i);
 		bullet_t *bullet = player_shoot_blanket(player);
-		bullet->color &= 0x65;
+		bullet->color &= 0x6D;
 		list_add(bulletlist, bullet);
 		for (int l = 0; l < SCOPEDOTS; l++) {
 			for (int s = 0; s < SCOPESTEPS; s++) {
